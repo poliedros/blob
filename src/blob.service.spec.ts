@@ -1,17 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { mock } from 'jest-mock-extended';
-import { BLOB_SERVICE } from './constants';
-import azurestorage from 'azure-storage';
+import { AZURE_BLOB_SERVICE } from './constants';
+import { BlobService as AzureBlobService } from 'azure-storage';
 import { BlobService } from './blob.service';
 
 describe('BlobService', () => {
   let service: BlobService;
-  const blobServiceMock =
-    mock<azurestorage.services.blob.blobservice.BlobService>();
+  const blobServiceMock = mock<AzureBlobService>();
 
   beforeEach(async () => {
     const blobServiceProvider = {
-      provide: BLOB_SERVICE,
+      provide: AZURE_BLOB_SERVICE,
       useValue: blobServiceMock,
     };
 
@@ -29,7 +28,7 @@ describe('BlobService', () => {
       async () => (uploadImage = true),
     );
 
-    await service.uploadFile('file name', 'file64image.png');
+    await service.uploadFile('file name', 'data:image/png;base64,iVnBO');
 
     expect(uploadImage).toBeTruthy();
   });

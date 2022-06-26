@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import azurestorage from 'azure-storage';
-import { BLOB_SERVICE } from './constants';
+import { BlobService as AzureBlobService } from 'azure-storage';
+import { AZURE_BLOB_SERVICE } from './constants';
 
 interface IBlobService {
   uploadFile(filename: string, file: string);
@@ -9,18 +9,20 @@ interface IBlobService {
 @Injectable()
 export class BlobService implements IBlobService {
   constructor(
-    @Inject(BLOB_SERVICE)
-    private readonly blobService: azurestorage.services.blob.blobservice.BlobService,
+    @Inject(AZURE_BLOB_SERVICE)
+    private readonly blobService: AzureBlobService,
   ) {}
 
   async uploadFile(filename: string, file: string): Promise<string> {
     const matches = file.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    const imageFormat = matches![1];
     const buffer = new Buffer(matches![2], 'base64');
 
     await this.blobService.createBlockBlobFromText(
-      process.env.IMAGE_CONTAINER_NAME,
+      'storage-images',
       filename,
       buffer,
+      { contentSettings: { contentType: imageFormat } },
       (error: any, result: any, response: any) => {
         if (error) filename = 'default.jpg';
       },

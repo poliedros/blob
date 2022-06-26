@@ -29,7 +29,7 @@ $ npm run test:cov
 
 ## Stay in touch
 
-- Author - [Carlos Zansavio](carlos@czar.dev)
+- Author - [Carlos Zansavio](mailto:carlos@czar.dev)
 
 ## License
 
