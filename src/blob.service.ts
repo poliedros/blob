@@ -3,7 +3,8 @@ import { BlobService as AzureBlobService } from 'azure-storage';
 import { AZURE_BLOB_SERVICE } from './constants';
 
 interface IBlobService {
-  uploadFile(filename: string, file: string);
+  uploadTextFile(filename: string, file: string): string;
+  uploadBufferFile(filename: string, file: Buffer): string;
 }
 
 @Injectable()
@@ -13,16 +14,32 @@ export class BlobService implements IBlobService {
     private readonly blobService: AzureBlobService,
   ) {}
 
-  async uploadFile(filename: string, file: string): Promise<string> {
+  uploadTextFile(filename: string, file: string): string {
     const matches = file.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
     const imageFormat = matches![1];
     const buffer = new Buffer(matches![2], 'base64');
 
-    await this.blobService.createBlockBlobFromText(
+    this.blobService.createBlockBlobFromText(
       'storage-images',
       filename,
       buffer,
       { contentSettings: { contentType: imageFormat } },
+      (error: any, result: any, response: any) => {
+        if (error) filename = 'default.jpg';
+      },
+    );
+
+    return filename;
+  }
+
+  uploadBufferFile(filename: string, file: Buffer): string {
+    const fileFormat = filename.match(/\.(.*)/)[1];
+
+    this.blobService.createBlockBlobFromText(
+      'storage-images',
+      filename,
+      file,
+      { contentSettings: { contentType: fileFormat } },
       (error: any, result: any, response: any) => {
         if (error) filename = 'default.jpg';
       },
