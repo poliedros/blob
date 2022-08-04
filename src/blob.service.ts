@@ -4,7 +4,7 @@ import { AZURE_BLOB_SERVICE } from './constants';
 
 interface IBlobService {
   uploadTextFile(filename: string, file: string): string;
-  uploadBufferFile(filename: string, file: Buffer): string;
+  uploadBufferFile(filename: string, fileFormat: string, file: Buffer): string;
 }
 
 @Injectable()
@@ -32,9 +32,7 @@ export class BlobService implements IBlobService {
     return filename;
   }
 
-  uploadBufferFile(filename: string, file: Buffer): string {
-    const fileFormat = filename.match(/\.(.*)/)[1];
-
+  uploadBufferFile(filename: string, fileFormat: string, file: Buffer): string {
     this.blobService.createBlockBlobFromText(
       'storage-images',
       filename,
